@@ -2,6 +2,44 @@
 const inquirer = require('inquirer');
 const fileSystem = require('fs');
 
+const askMainMenuQuestion = (engineers, interns) => {
+    // This will ask:
+    // What would you like to do:
+    // - Add an Intern
+    // - Add an Engineer
+    // - Finish
+    const mainMenuPrompt = {
+        type: 'list',
+        name: 'answer',
+        message: 'What do you want to do?',
+        choices: [
+            `Add an Intern`,
+            `Add an Engineer`,
+
+            new inquirer.Separator(),
+            `finish!`
+        ],
+    };
+    // run the program above
+    inquirer.prompt(mainMenuPrompt).then((answersMainQuestions) => {
+        // 5 == "5" TRUE
+        // 5 === "5" F
+        if (answersMainQuestions.answer === `Add an Intern`) {
+            askInternQuestions(engineers, interns);
+        } else if (answersMainQuestions.answer === `Add an Engineer`) {
+            askEngineerQuestions(engineers, interns);
+        } else {
+            // Save results to an HTML file
+            console.log("Saving data to HTML file...");
+        }
+    });
+
+    // FLOW:
+    /**
+        mainMenuQuestion -> Intern/Engineer Question -> mainMenuQuestion
+    */
+};
+
 // TODO: Create an array of questions for user input
 const managerPrompts = [{
     type: "input",
@@ -38,11 +76,12 @@ function init() {
             const manager = new Manager(answers.Name, answers.Id, answers.Email, answers.officeNumber);
             const engineers = [];
             const interns = [];
+            askMainMenuQuestion(engineers, interns);
             //step two: save details as a pretty HTML File
         });
 }
 
-function askEngineerQuestions(engineerList) {
+function askEngineerQuestions(engineerList, internList) {
     const engineerPrompts = [{
         type: "input",
         name: "Name",
@@ -64,11 +103,12 @@ function askEngineerQuestions(engineerList) {
     inquirer.prompt(engineerPrompts).then((answers) => {
         const engineer = new Engineer(answers.Name, answers.Id, answers.Email, answers.Github);
         engineerList.push(engineer);
-        // main menu function
+
+        askMainMenuQuestion(engineerList, internList);
     });
 }
 
-function askInternQuestions(internList) {
+function askInternQuestions(engineerList, internList) {
     const internPrompts = [{
         type: "input",
         name: "Name",
@@ -90,7 +130,7 @@ function askInternQuestions(internList) {
     inquirer.prompt(internPrompts).then((answers) => {
         const intern = new Intern(answers.Name, answers.Id, answers.Email, answers.School);
         internList.push(intern);
-        // main menu function
+        askMainMenuQuestion(engineerList, internList);
     });
 }
 
