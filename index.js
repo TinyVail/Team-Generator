@@ -1,5 +1,8 @@
 // TODO: Include packages needed for this application
 const inquirer = require('inquirer');
+const Engineer = require("./src/Engineer.js");
+const Intern = require("./src/Intern.js");
+const Manager = require("./src/Manager.js");
 const fileSystem = require('fs');
 
 const askMainMenuQuestion = (engineers, interns) => {
