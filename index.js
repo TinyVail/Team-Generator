@@ -5,7 +5,7 @@ const Intern = require("./src/Intern.js");
 const Manager = require("./src/Manager.js");
 const fileSystem = require('fs');
 
-const askMainMenuQuestion = (engineers, interns) => {
+const askMainMenuQuestion = (manager, engineers, interns) => {
     // This will ask:
     // What would you like to do:
     // - Add an Intern
@@ -28,12 +28,74 @@ const askMainMenuQuestion = (engineers, interns) => {
         // 5 == "5" TRUE
         // 5 === "5" F
         if (answersMainQuestions.answer === `Add an Intern`) {
-            askInternQuestions(engineers, interns);
+            askInternQuestions(manager, engineers, interns);
         } else if (answersMainQuestions.answer === `Add an Engineer`) {
-            askEngineerQuestions(engineers, interns);
+            askEngineerQuestions(manager, engineers, interns);
         } else {
             // Save results to an HTML file
             console.log("Saving data to HTML file...");
+
+            const managerHTML = `
+                <div class="card" style="width: 18rem;">
+                    <div class="card-body">
+                        <h5 class="card-title">${manager.getName()}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">Manager</h6>
+                        <p class="card-text">Email: ${manager.getEmail()}\nOffice Number:${manager.getOfficeNumber()}</p>
+                        <a href="#" class="card-link">Card link</a>
+                        <a href="#" class="card-link">Another link</a>
+                    </div>
+                </div>`;
+            // reduce takes in an arrow function with two arguments:
+            // accumulator: the sum total so far of everything (runningTotalHTML)
+            // currentValue: the current element to process (currentInternHTML)
+            /* Exmaple:
+            
+            const numbers = [1, 2, 3, 4, 5];
+            console.log(numbers.reduce((acc, val) => acc + val); // this logs 15
+
+            */
+            const internHTML = interns.reduce((runningTotalHTML, currentIntern) => {
+                return runningTotalHTML + `
+                <div class="card" style="width: 18rem;">
+                    <div class="card-body">
+                        <h5 class="card-title">${currentIntern.getName()}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">Intern</h6>
+                        <p class="card-text">Email: ${currentIntern.getEmail()}\nSchool:${currentIntern.getSchool()}</p>
+                        <a href="#" class="card-link">Card link</a>
+                        <a href="#" class="card-link">Another link</a>
+                    </div>
+                </div>
+                `;
+            }, "");
+
+            const template = `
+                <html>
+                    <head>
+                        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-wEmeIV1mKuiNpC+IOBjI7aAzPcEZeedi5yW5f2yOq55WWLwNGmvvx4Um1vskeMj0" crossorigin="anonymous">
+                    </head>
+                    <body>
+                        <div id="container">
+                            <div id="row">
+                                <div id="col">
+                                    ${managerHTML} 
+                                </div>
+                            </div>
+                            <div id="row">
+                                <div id="col">
+                                    ☺
+                                    ${JSON.stringify(engineers) /**TODO: convert engineers to html */} 
+                                </div>
+                            </div>
+                            <div id="row">
+                                <div id="col">
+                                    ${internHTML} 
+                                </div>
+                            </div>
+                        </div>
+                    </body>
+                </html>
+            `;
+            writeToFile("./dist/output.html", template);
         }
     });
 
@@ -79,12 +141,12 @@ function init() {
             const manager = new Manager(answers.Name, answers.Id, answers.Email, answers.officeNumber);
             const engineers = [];
             const interns = [];
-            askMainMenuQuestion(engineers, interns);
+            askMainMenuQuestion(manager, engineers, interns);
             //step two: save details as a pretty HTML File
         });
 }
 
-function askEngineerQuestions(engineerList, internList) {
+function askEngineerQuestions(manager, engineerList, internList) {
     const engineerPrompts = [{
         type: "input",
         name: "Name",
@@ -107,11 +169,11 @@ function askEngineerQuestions(engineerList, internList) {
         const engineer = new Engineer(answers.Name, answers.Id, answers.Email, answers.Github);
         engineerList.push(engineer);
 
-        askMainMenuQuestion(engineerList, internList);
+        askMainMenuQuestion(manager, engineerList, internList);
     });
 }
 
-function askInternQuestions(engineerList, internList) {
+function askInternQuestions(manager, engineerList, internList) {
     const internPrompts = [{
         type: "input",
         name: "Name",
@@ -133,7 +195,7 @@ function askInternQuestions(engineerList, internList) {
     inquirer.prompt(internPrompts).then((answers) => {
         const intern = new Intern(answers.Name, answers.Id, answers.Email, answers.School);
         internList.push(intern);
-        askMainMenuQuestion(engineerList, internList);
+        askMainMenuQuestion(manager, engineerList, internList);
     });
 }
 
