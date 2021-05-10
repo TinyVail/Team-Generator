@@ -68,6 +68,19 @@ const askMainMenuQuestion = (manager, engineers, interns) => {
                 `;
             }, "");
 
+            const engineerHTML = engineers.reduce((runningTotalHTML, currentEngineer) => {
+                return runningTotalHTML + `
+                <div class="card" style="width: 18rem;">
+                    <div class="card-body">
+                        <h5 class="card-title">${currentEngineer.getName()}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">Engineer</h6>
+                        <p class="card-text">Email: ${currentEngineer.getEmail()}</p>
+                        <a href="www.github.com/${currentEngineer.getGithub()}" class="card-link">Github Link</a>
+                    </div>
+                </div>
+                `;
+            }, "");
+
             const template = `
                 <html>
                     <head>
@@ -83,7 +96,7 @@ const askMainMenuQuestion = (manager, engineers, interns) => {
                             <div id="row">
                                 <div id="col">
                                     ☺
-                                    ${JSON.stringify(engineers) /**TODO: convert engineers to html */} 
+                                    ${engineerHTML} 
                                 </div>
                             </div>
                             <div id="row">
